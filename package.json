@@ -1,0 +1,8 @@
+{
+  "name": "brainstem",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "brain": "bun check.mjs"
+  }
+}
