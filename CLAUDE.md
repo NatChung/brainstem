@@ -14,7 +14,7 @@ BRAIN="$(d="$PWD"; while [ "$d" != / ] && [ ! -e "$d/.brainroot" ]; do d="$(dirn
 ## 首次設定(對話式 onboarding)
 **每次 session 載入都先讀根目錄 `lens.md`**——若仍含 `<!-- LENS_UNCONFIGURED -->`,在執行使用者任何請求之前先跑以下 onboarding。
 
-skills 已在 repo 內、**開 repo 即可用**(`/brainstem-ingest`·`/brainstem-query`·`/brainstem-synthesize`),**不必安裝**。你的 note 存在這個 repo 的 `./notes/`、entities 在 `./entities/`。
+三個 skill 的本體在 repo 的 `skills/`,但 **Claude Code 只掃 `.claude/skills/`(專案)與 `~/.claude/skills/`(全域)、不掃 top-level `skills/`** —— 所以**第一次用本 repo 也要先安裝**:跑 `bash install.sh`(把 `skills/brainstem-*` symlink 進 `~/.claude/skills/`)後**重開 session**,`/brainstem-ingest`·`/brainstem-query`·`/brainstem-synthesize` 才會進選單。裝過一次就好(idempotent,日後 pull 更新不必重跑)。你的 note 存在這個 repo 的 `./notes/`、entities 在 `./entities/`。
 
 **第 0 步:環境預檢**——先跑 `bun run doctor` 確認環境就緒(`.brainroot` / `lens.md` 設定了沒 / `yt-dlp` / whisper)。紅項缺先照它的提示補(doctor 唯讀、只檢查不動東西)。過了再往下。
 
@@ -29,7 +29,7 @@ skills 已在 repo 內、**開 repo 即可用**(`/brainstem-ingest`·`/brainstem
 2. **餵第一個來源**:用 `brainstem-ingest` 餵一個 URL 或一段貼上的想法,建第一則 note。
 3. **體檢**:`bun run brain`,確認 0 孤島 / 0 斷鏈。
 
-> 進階:想在**別的 repo** 也能呼叫這顆腦 → 跑 `bash install.sh`(全域裝 `~/.claude/skills/brainstem-*`,**需重開 session**)。先前裝過(任何舊版/前綴)的全域 symlink 在 skill 改名後會斷,重跑一次 `install.sh` 即可。本 repo 內不需要。
+> `install.sh` 是全域裝 `~/.claude/skills/brainstem-*`,裝完**本 repo 與任何其他 repo 都能呼叫**這顆腦。先前裝過(任何舊版/前綴)的全域 symlink 在 skill 改名後會斷,重跑一次 `install.sh` 即可。
 
 ## 原子筆記紀律
 - 一則 note 一個想法;過長就拆。
