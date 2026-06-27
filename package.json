@@ -3,6 +3,7 @@
   "private": false,
   "type": "module",
   "scripts": {
-    "brain": "bun check.mjs"
+    "brain": "bun check.mjs",
+    "doctor": "bun doctor.mjs"
   }
 }
