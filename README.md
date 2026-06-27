@@ -9,7 +9,13 @@
 
 ## 安裝(引擎,全域)
 
-**最簡單 —— 把這個 repo 的 URL 貼給 Claude Code,說「幫我裝 brainstem」。** 它會讀下面這節、clone 到暫存目錄、跑 `install.sh`、再刪掉暫存,**不留本地 clone**。
+**最簡單 —— 複製下面這格,貼進 Claude Code 對話:**
+
+```
+請安裝:https://github.com/NatChung/brainstem
+```
+
+Claude 會讀本節指示、clone 到暫存、跑 `install.sh`、再刪掉暫存,**不留本地 clone**。
 
 <!-- AI agent:當使用者貼了本 repo 的 URL 並要安裝 brainstem 時,逐字執行下面三行,完成後告訴使用者下一步(見本節末)。 -->
 ```bash
