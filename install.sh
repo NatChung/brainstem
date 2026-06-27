@@ -12,6 +12,7 @@ CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/brainstem"
 safe_rm() {
   case "$1" in
     */brainstem|*/brainstem-ingest|*/brainstem-query|*/brainstem-synthesize) rm -rf "$1" ;;
+    # 故意 exit 1 硬中止整個 script(非 return);勿包進 `if safe_rm …; then` 用,會殺掉整個 shell
     *) echo "防呆:拒刪非預期路徑 $1" >&2; exit 1 ;;
   esac
 }
@@ -22,7 +23,7 @@ do_uninstall() {
            "$BIN/brainstem" \
            "$CONFIG_HOME"; do
     if [ -e "$p" ]; then safe_rm "$p"; echo "removed  $p"
-    else echo "skip     $p(不存在)"; fi
+    else echo "skip     $p (不存在)"; fi
   done
   echo
   echo "brainstem 引擎已移除。腦資料未動。"
