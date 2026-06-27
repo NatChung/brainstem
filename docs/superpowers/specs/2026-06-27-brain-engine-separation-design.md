@@ -47,12 +47,12 @@ brainstem 是**公開的引擎/範本**(MIT、README 主打「clone 下來養出
 
 新增 `lib/find-brain.mjs`,匯出解析函式,**優先序**:
 
-1. `BRAIN_DIR` 環境變數(後門 / 測試)。
+1. `BRAIN_DIR` 環境變數(後門 / 測試)——**直接採信,不要求該路徑含 `.brainroot`**(`bin/test-doctor.sh` case C 依賴此放寬;與第 3 級不同,刻意保留不對稱)。
 2. 從 `process.cwd()` 往上走找第一個含 `.brainroot` 的目錄(你正待在某顆腦裡 → 該腦勝出)。
-3. **全域指標**:`$XDG_CONFIG_HOME/brainstem/config.json`(預設 `~/.config/brainstem/config.json`),格式 `{ "brain": "/abs/path" }` → 用其 `brain`(需該路徑仍含 `.brainroot`,否則視為失效)。
-4. 都沒有 → 丟可讀錯誤並 exit 1:`找不到腦 — cd 進一顆,或 brainstem init <dir> / brainstem use <dir>。`
+3. **全域指標**:`$XDG_CONFIG_HOME/brainstem/config.json`(預設 `~/.config/brainstem/config.json`),格式 `{ "brain": "/abs/path" }` → 用其 `brain`(需該路徑仍含 `.brainroot`,否則視為失效、當作未設定)。
+4. 都沒有 → 丟可讀錯誤(**寫 stderr**,非 stdout)並 exit 1:`找不到腦 — cd 進一顆,或 brainstem init <dir> / brainstem use <dir>。`
 
-`check.mjs`、`doctor.mjs` 都改用此函式取 `BRAIN`。`brainstem where` 也用它(印解析結果)。skills 改成呼叫 `brainstem where`(見 F),全圖**單一解析實作**。
+**實作入口**:`lib/find-brain.mjs` 同時(a)匯出解析函式給 `check.mjs`/`doctor.mjs` import(三者同被複製進 `ENGINE_HOME`,相對 import `./lib/find-brain.mjs` 成立),且(b)**可直接被當 CLI 跑**——`bun ENGINE_HOME/lib/find-brain.mjs` 解析成功印絕對路徑到 stdout、失敗印錯誤到 stderr + exit 1。`brainstem where` = 這支直跑。skills 改成 `BRAIN="$(brainstem where)"`(見 F),全圖**單一解析實作**(取代現行 `bin/brain-root.sh` 與 skills 各自的 inline walk)。
 
 ### B. 引擎全域家(複製模型)+ VERSION + repo 可刪
 
@@ -84,7 +84,11 @@ brainstem --help           # 列出子命令
 ```
 
 - `init <dir>`:`<dir>` 不存在 → 建立;已含 `.brainroot` → 拒絕並提示;存在且非空但無 `.brainroot` → 拒絕(不冒險合併),提示換空目錄或先清。完成後印「下一步:`cd <dir>`,用 Claude Code 開啟說 hi 走 onboarding」,並建議 `git init` + 設**私有** remote(不強制、不代跑)。
-- CLI 是純 POSIX shell;Node 腳本一律 `bun ENGINE_HOME/<script>.mjs`。
+- **實作分工**:CLI dispatcher 是純 POSIX shell,只做分派;有狀態的動作交給 `ENGINE_HOME` 下的 Node 腳本:
+  - `brainstem where` → `bun ENGINE_HOME/lib/find-brain.mjs`(A 的入口)。
+  - `brainstem use <dir>` 與 `init` 的「寫全域指標」→ `bun ENGINE_HOME/lib/config.mjs set <dir>`:把 `<dir>` **正規化成絕對路徑**、驗證含 `.brainroot`(`use` 必驗;`init` 寫的是剛建好的腦)、`mkdir -p` config 目錄、寫 `{ "brain": "<abs>" }`。`use` 對無 `.brainroot` 的 `<dir>` 拒絕並 exit 1。
+  - `init <dir>` = 複製 `_brain-template/` + (指標未設定時)`config.mjs set <dir>`。
+  - `check`/`doctor` → `bun ENGINE_HOME/{check,doctor}.mjs`;`--version` → `cat ENGINE_HOME/VERSION`。
 
 ### D. `install.sh`(複製式、idempotent = 升級)
 
@@ -92,8 +96,12 @@ brainstem --help           # 列出子命令
 2. `mkdir -p` 全域家,**複製** `check.mjs doctor.mjs init.mjs lib/ _brain-template/ VERSION` 進去(`_templates/` 已含於 `_brain-template/` 內;覆寫 = 升級)。
 3. **複製** `skills/brainstem-*` → `~/.claude/skills/`(真實檔,非 symlink)。
 4. 寫 `~/.local/bin/brainstem`(內容引用固定 `ENGINE_HOME`)、`chmod +x`。
-5. PATH 檢查:若 `~/.local/bin` 不在 `$PATH`,印提示(偵測 `case ":$PATH:"`,建議加進 shell rc;**不自動改** rc)。
+5. PATH 檢查:若 `~/.local/bin` 不在 `$PATH`,印**明顯**提示(偵測 `case ":$PATH:"`,建議加進 shell rc;**不自動改** rc)。因 skills 改用 `brainstem where`(見 F),PATH 沒設好會讓**每次 skill 呼叫**都 `command not found` → 此提示是 AC1 的關鍵,不可只輕描淡寫。
 6. idempotent:重跑即覆寫升級;印新舊 `VERSION`。
+7. **既有 `bin/` 測試同步**(複製模型的連帶):
+   - `bin/test-install.sh:10` 斷言 `[ -L … ]`(symlink)→ 改 `[ -e … ] && [ ! -L … ]`(真實檔、非 symlink);並加驗 `~/.local/bin/brainstem`、`ENGINE_HOME/VERSION` 存在。
+   - `bin/brain-root.sh`(現行 `.brainroot` 上行 walk)由 `lib/find-brain.mjs` / `brainstem where` 取代 → 退役(刪除或改成轉呼叫 `brainstem where`)。
+   - `bin/test-brain-root.sh`、`bin/test-doctor.sh` retarget 到 `brainstem where` / `brainstem doctor`(case C 的 `BRAIN_DIR` 不需 `.brainroot` 之依賴,對應 A 第 1 級的放寬,保留)。
 
 ### E. `_brain-template/` —— 開新腦的完整骨架
 
@@ -124,9 +132,14 @@ _brain-template/
 
 非目標原宣稱「skills 不用改」是錯的;skills 有兩類 repo 耦合要改,**其餘 `$BRAIN/…`(lens/notes/entities/_templates/_index/log/sources/docs)維持不變,因為那些都是腦本地、由範本帶齊**:
 
-1. **定位腦**:三個 SKILL.md 開頭的 inline `.brainroot` walk(各約 line 11–12)→ 改成 `BRAIN="$(brainstem where)" || { echo "找不到腦"; exit 1; }`。解析優先序與全域指標統一由 CLI 提供。
+1. **定位腦**:三個 SKILL.md 開頭的 inline `.brainroot` walk(各約 line 11–12)→ 改成先探 `brainstem` 在不在 PATH,再解析:
+   ```sh
+   command -v brainstem >/dev/null || { echo "找不到 brainstem 指令 — 把 ~/.local/bin 加進 PATH,或重跑 install.sh。" >&2; exit 1; }
+   BRAIN="$(brainstem where)" || exit 1   # where 失敗訊息已走 stderr
+   ```
+   解析優先序與全域指標統一由 CLI 提供;PATH 探測避免「裝了但沒進 PATH」時 skill 默默 `command not found`(見 D.5)。
 2. **呼叫 check**:
-   - `brainstem-ingest/SKILL.md:19`:`bun "$BRAIN/check.mjs" --dup <src>` → `brainstem --dup <src>`。
+   - `brainstem-ingest/SKILL.md:19`:`bun "$BRAIN/check.mjs" --dup <src>` → `brainstem check --dup <src>`。
    - `brainstem-ingest/SKILL.md:30`、`brainstem-synthesize/SKILL.md:40`:`bun "$BRAIN/check.mjs"` → `brainstem check`。
 3. **query 轉達位置**:`brainstem-query/SKILL.md` 加一條:被問「我腦在哪 / 換腦」時,跑 `brainstem where`(或引導 `brainstem use <dir>`)作答。滿足 AC3。
 
@@ -135,7 +148,7 @@ _brain-template/
 - **`_brain-template/CLAUDE.md`(腦版,使用者實際用的)**:由現行 CLAUDE.md 改寫——保留 onboarding 三步、原子筆記紀律、lens 訪談、語言政策;但
   - 移除「先跑 install.sh symlink skills」整段(引擎已全域裝好)。
   - 第 0 步環境預檢 `bun run doctor` → `brainstem doctor`。
-  - 工具段 `bun run brain` → `brainstem check`;去重 `bun run brain --dup` → `brainstem --dup`。
+  - 工具段 `bun run brain` → `brainstem check`;去重 `bun run brain --dup` → `brainstem check --dup`。
   - 提及「腦在哪可 `brainstem where` 查、`brainstem use` 改」。
 - **引擎 repo 根 `CLAUDE.md`(引擎/貢獻者版)**:重寫為架構說明——複製式安裝、`ENGINE_HOME`、CLI dispatcher、`find-brain` 解析、`_brain-template/` 結構、如何測試(見驗收),以及**「別把個人 notes commit 進引擎 repo」**的警告。
 
@@ -145,7 +158,7 @@ _brain-template/
   1. `git clone <repo> && cd brainstem && bash install.sh`(複製全域 skills + 引擎 + `brainstem` CLI;**裝完此 repo 可刪**)。
   2. `brainstem init ~/mybrain`(建議放私有處 / 設私有 git remote)。
   3. `cd ~/mybrain`,用 Claude Code 開啟說 hi → onboarding。
-  - 「結構」段標明:引擎出 `skills/ check.mjs doctor.mjs init.mjs lib/ _brain-template/ _templates/ VERSION install.sh`;腦才有 `notes/ entities/ lens.md _index.md docs/drafts/`。
+  - 「結構」段標明:引擎出 `skills/ check.mjs doctor.mjs init.mjs lib/ _brain-template/ VERSION install.sh`(`_templates/` 在 `_brain-template/` 內,非頂層);腦才有 `notes/ entities/ lens.md _index.md docs/drafts/`。
   - 加「升級」一句:重 clone + 重跑 install.sh;`brainstem --version` 查裝了哪版。
 - `package.json`:**移除** `brain`/`doctor` scripts(引擎根不是腦,跑了也報「找不到腦」)。保留 `type:module` 與 `name`。引擎入口改為全域 `brainstem` CLI。
 
@@ -167,9 +180,10 @@ README 加一段「從舊版遷移」。
 
 | 檔案 | 動作 |
 |---|---|
-| `lib/find-brain.mjs` | 新增(BRAIN_DIR → cwd walk → 全域 config → error) |
+| `lib/find-brain.mjs` | 新增(BRAIN_DIR → cwd walk → 全域 config → error;可 import 亦可直跑當 `brainstem where`) |
+| `lib/config.mjs` | 新增(讀/寫全域指標 `config.json`;`set <dir>` 供 `use`/`init`) |
 | `check.mjs` | 改用 find-brain 定位 BRAIN |
-| `doctor.mjs` | 改用 find-brain |
+| `doctor.mjs` | 改用 find-brain;加檢 `brainstem` 是否在 PATH;印當前 VERSION |
 | `init.mjs` | 新增(`brainstem init` 實作) |
 | `VERSION` | 新增(如 `0.1.0`) |
 | `install.sh` | 改複製式;裝 ENGINE_HOME + `~/.local/bin/brainstem` + 複製 skills;PATH 提示 |
@@ -178,6 +192,9 @@ README 加一段「從舊版遷移」。
 | `skills/brainstem-query/SKILL.md` | 定位改 `brainstem where`;加「問腦在哪 → `brainstem where`」 |
 | `skills/brainstem-synthesize/SKILL.md` | 定位改 `brainstem where`;`check.mjs`→`brainstem check` |
 | 根 `.brainroot`/`lens.md`/`log.md`/`_index.md`/`notes/`/`entities/`/`_templates/`/`sources/` | 移除(內容入 `_brain-template/`) |
+| `bin/test-install.sh` | 改 symlink 斷言為「真實檔非 symlink」;加驗 `brainstem` CLI + VERSION |
+| `bin/brain-root.sh` | 退役(由 `find-brain.mjs`/`brainstem where` 取代) |
+| `bin/test-brain-root.sh`、`bin/test-doctor.sh` | retarget 到 `brainstem where`/`doctor` |
 | 根 `CLAUDE.md` | 重寫為引擎/貢獻者版 |
 | `README.md` | 改安裝/結構/升級/遷移 |
 | `package.json` | 移除 `brain`/`doctor` scripts |
@@ -194,16 +211,26 @@ README 加一段「從舊版遷移」。
 8. **AC4 — repo 可刪**:`brainstem init /tmp/tb` 後,`mv` 或 `rm -rf` 引擎 repo,再 `cd /tmp/tb && brainstem check`、呼叫任一 skill → **仍正常**(全部已複製出 repo)。
 9. **後門**:`BRAIN_DIR=/tmp/tb brainstem check`(在別處)→ 對 /tmp/tb 跑。
 10. **init 防呆**:對已是腦的目錄 `init` → 拒絕;對非空無 `.brainroot` 目錄 → 拒絕。
-11. **ingest 端到端**:在 `/tmp/tb` 餵一個來源 → 建頁、補 `_index.md`、`brainstem --dup` 去重命中、`brainstem check` 0 孤島/0 斷鏈,全程不碰引擎 repo 路徑。
+11. **ingest 端到端**:在 `/tmp/tb` 餵一個來源 → 建頁、補 `_index.md`、`brainstem check --dup` 去重命中、`brainstem check` 0 孤島/0 斷鏈,全程不碰引擎 repo 路徑。
 12. **引擎 repo `git status`**:不含任何個人 note / 設定過的 lens。
 
 ## 風險 / 取捨
 
 - **複製 → 走味**:全域是靜態快照,`git pull` 不自動更新。緩解:`VERSION` + `brainstem --version`;升級 = 重 clone + 重跑 install.sh;`doctor` 可印當前 VERSION 供人工核對。(已知取捨,換得 AC4 與不鎖平台。)
-- **`~/.local/bin` 未在 PATH**:install.sh 偵測並提示,不自動改 rc。
+- **`~/.local/bin` 未在 PATH(升級為承重風險)**:skills 改用 `brainstem where` 後,PATH 沒設好會讓**每次 skill 呼叫**`command not found`,直接威脅 AC1。緩解:install.sh 明顯提示(不自動改 rc)+ skill 片段先 `command -v brainstem` 探測並引導(F.1)+ `doctor` 增一檢:`brainstem` 是否在 PATH。
+- **doctor 在非腦目錄的行為變了**:現行印「❌ .brainroot 不存在」走完清單;改用 find-brain 後會在解析階段就 exit 1。屬預期、無害,文件提一句即可。
 - **兩個 CLAUDE.md 漂移**:腦版是唯一給使用者的真相,引擎版只談架構,職責不重疊以降風險。
 - **全域指標失效**(腦被 `mv` 走):`find-brain` 偵測指標路徑已無 `.brainroot` → 當作未設定、報錯引導重 `brainstem use`。
 - **單機單預設腦**:全域指標目前只存一顆預設腦;多腦靠 `cd` 進該腦(cwd-walk 優先於指標)或 `BRAIN_DIR`。多腦具名切換列為未來(YAGNI)。
+
+## 實作切分(供 writing-plans)
+
+範圍偏大(find-brain + config + dispatcher + init.mjs + `_brain-template/` + skill 編輯 + docs/migration),建議拆成有序子計畫,前者為後者的前置:
+
+1. **引擎核心**:`lib/find-brain.mjs`(含直跑 CLI)、`lib/config.mjs`、`check.mjs`/`doctor.mjs` 改用 find-brain、複製式 `install.sh` + `~/.local/bin/brainstem` dispatcher + `VERSION`、修 `bin/` 測試。出口:`brainstem where/use/check/doctor/--version` 可跑、`bin/` 測試綠。
+2. **範本 + init**:組 `_brain-template/`(含 seed、未設定 lens、_index、_templates、佔位)、`init.mjs`、`brainstem init` 串接 config.mjs。出口:`brainstem init` 出一顆可 doctor 的腦。
+3. **skills 編輯**(用 `/writing-skills` 規範):三個 SKILL.md 定位改 `brainstem where`(含 PATH 探測)、兩處 `check.mjs`→`brainstem check`/`brainstem check --dup`、query 加問位置。出口:在 init 出的腦端到端 ingest 不碰 repo 路徑。
+4. **文件 + 善後**:README、CLAUDE.md 拆引擎/腦版、遷移段、移除根腦檔與 `package.json` scripts。出口:引擎 repo `git status` 不含個人內容、AC4 刪 repo 測試過。
 
 ## 決策紀錄(供日後回溯)
 
