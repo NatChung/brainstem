@@ -1,9 +1,9 @@
 ---
-name: query
+name: brainstem-query
 description: 問你的知識圖譜(brain)。從已累積的 notes/entities 回答問題、拉某主題的素材與連結,供思考與找寫作角度。唯讀不改圖。Trigger:「問 brain」/「brain 裡有沒有 X」/「找 X 的素材」。
 ---
 
-# query — 查你的知識圖譜
+# brainstem-query — 查你的知識圖譜
 
 ## 定位 brain(每次最先跑)
 `$BRAIN` = 從 cwd 向上找到的腦根(含 `.brainroot` 的目錄):
@@ -14,7 +14,7 @@ BRAIN="$(d="$PWD"; while [ "$d" != / ] && [ ! -e "$d/.brainroot" ]; do d="$(dirn
 
 ## 前置
 - 確認 `$BRAIN` 已定位(見上「定位 brain」);未定位則停止。
-- **唯讀**:本 skill 不建/不改任何頁(要建頁用 ingest)。
+- **唯讀**:本 skill 不建/不改任何頁(要建頁用 brainstem-ingest)。
 
 ## 流程
 先讀 `$BRAIN/lens.md`,讓「該浮什麼」朝使用者判準偏。

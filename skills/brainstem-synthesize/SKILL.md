@@ -1,9 +1,9 @@
 ---
-name: synthesize
+name: brainstem-synthesize
 description: 從你的知識圖譜(brain)的 notes/entities 合成文章草稿,落到 docs/drafts/。產帶 front-matter 與合成來源註解的草稿、補 log。Trigger:「產草稿」/「合成一篇」/「腦→草稿」。
 ---
 
-# synthesize — 從知識圖譜合成草稿
+# brainstem-synthesize — 從知識圖譜合成草稿
 
 ## 定位 brain(每次最先跑)
 `$BRAIN` = 從 cwd 向上找到的腦根(含 `.brainroot` 的目錄):

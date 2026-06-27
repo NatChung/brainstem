@@ -1,9 +1,9 @@
 ---
-name: ingest
+name: brainstem-ingest
 description: 把來源餵進你的知識圖譜(brain)。讀來源(URL / 貼進的想法 / 檔案),抽原子概念 + entities,建/更新互連的 markdown note 頁、cross-reference、補 index、寫 log。Trigger:「餵進 brain」/「ingest 這個」/「記進第二大腦」。
 ---
 
-# ingest — 餵料進你的知識圖譜
+# brainstem-ingest — 餵料進你的知識圖譜
 
 ## 定位 brain(每次最先跑)
 `$BRAIN` = 從 cwd 向上找到的腦根(含 `.brainroot` 的目錄):
