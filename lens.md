@@ -1,4 +1,4 @@
-<!-- LENS_UNCONFIGURED -->
+<!-- LENS_UNCONFIGURED:填完本檔後刪掉這行,引擎才視為已設定 -->
 # 我的 lens(觀點 / 判準)
 
 一句一條寫「我怎麼判斷、我偏好什麼」。ingest 收料、synthesize 生成、query 浮現都會讀這裡,讓腦朝「你會怎麼想」偏。

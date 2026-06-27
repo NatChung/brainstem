@@ -60,11 +60,10 @@ ALL.forEach((x) => {
 });
 const orphans = NOTES.filter((n) => !(outdeg[n.slug] > 0) && !backlink[n.slug]);
 
-const stat = {}, sk = {}, tags = {};
+const stat = {}, tags = {};
 NOTES.forEach((n) => {
   const f = fm(n.raw);
   stat[field(f, "status") || "?"] = (stat[field(f, "status") || "?"] || 0) + 1;
-  sk[field(f, "source_kind") || "(none)"] = (sk[field(f, "source_kind") || "(none)"] || 0) + 1;
   arr(f, "tags").forEach((t) => (tags[t] = (tags[t] || 0) + 1));
 });
 const sensitive = ALL.filter((x) => field(fm(x.raw), "sensitive") === "true").length;
@@ -75,8 +74,6 @@ const top = (o, n) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, n);
 console.log(`== 規模 ==\nnotes:${NOTES.length}  entities:${ENTS.length}  drafts:${drafts}`);
 console.log(`\n== 成熟度漏斗 ==`);
 top(stat, 9).forEach(([k, v]) => console.log(`  ${k}: ${v}`));
-console.log(`\n== 來源組成 (source_kind) ==`);
-top(sk, 9).forEach(([k, v]) => console.log(`  ${k}: ${v}`));
 console.log(`\n== 主題厚薄 (top tags) ==`);
 top(tags, 12).forEach(([k, v]) => console.log(`  ${k}: ${v}`));
 console.log(`\n== 圖健康 ==`);

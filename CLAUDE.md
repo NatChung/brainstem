@@ -12,12 +12,12 @@ BRAIN="$(d="$PWD"; while [ "$d" != / ] && [ ! -e "$d/.brainroot" ]; do d="$(dirn
 ```
 
 ## 首次設定(對話式 onboarding)
-**當使用者打招呼或說要開始,且偵測到「未設定」就主動帶他走**——
+**每次 session 載入都先讀根目錄 `lens.md`**——若仍含 `<!-- LENS_UNCONFIGURED -->`,在執行使用者任何請求之前先跑以下 onboarding 步驟。
 未設定的判準:根 `lens.md` 仍含 `<!-- LENS_UNCONFIGURED -->`。
 步驟:
 1. **裝 skills(全域)**:問使用者要不要把 `skills/*` symlink 進 `~/.claude/skills/`,以及要不要加前綴(預設無;要同機跑多顆腦或測試就加,例 `test` → `test-ingest`)。執行 `bash install.sh [前綴]`。
 2. **填 lens**:打開 `lens.md`,訪談使用者「你怎麼判斷、偏好什麼、語氣」,寫進去並**移除 `<!-- LENS_UNCONFIGURED -->` 那行**。
-3. **餵第一個來源**:用 `ingest` skill 餵一個 URL 或一段貼上的想法,建第一則 note。
+3. **餵第一個來源**:用 `ingest` skill 餵一個 URL 或一段貼上的想法,建第一則 note。⚠️ 透過 `install.sh` 全域安裝的 skill 要下一個 Claude Code session 才可直接呼叫——**本 session 第一次 ingest 請直接照 `skills/ingest/SKILL.md` 執行**(它在 repo 內、已自動載入);全域 `ingest`/`query`/`synthesize` 指令從下個 session 起生效。
 4. **體檢**:`bun run brain`,確認 0 孤島 / 0 斷鏈。
 
 ## 原子筆記紀律

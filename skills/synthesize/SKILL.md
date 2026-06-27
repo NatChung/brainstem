@@ -34,7 +34,7 @@ BRAIN="$(d="$PWD"; while [ "$d" != / ] && [ ! -e "$d/.brainroot" ]; do d="$(dirn
    ```
    緊接一行 **HTML 合成來源註解**(草稿階段用這個):
    `<!-- 合成來源 notes: a, b ; entity: x ; source_kind=… -->`
-   **不要**在草稿 front-matter 寫 `source_notes:` 欄 —— 那是 publish 上站時才加。
+   **不要**在草稿 front-matter 寫 `source_notes:` 欄 —— 草稿階段只用上面的 HTML 合成來源註解。
 3. **內文規範**:用你 brain 的慣用語言撰寫。**不複述來源原文**(萃取觀點,不搬運句子);show, don't sell;語氣與立場一律以 `$BRAIN/lens.md` 為準。
 4. **補 log**:`$BRAIN/log.md` append 一行 `YYYY-MM-DD synthesize — <來源> → docs/drafts/<slug>.md(待 review)`。
 5. **體檢**:草稿在 `docs/drafts/`,**不進 wikilink 圖** → 不必跑 check.mjs;只有當你**同時動到** `notes/`/`entities/` 才跑 `bun "$BRAIN/check.mjs"` 確認 0 孤島/0 斷鏈。

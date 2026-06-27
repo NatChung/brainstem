@@ -33,4 +33,4 @@ BRAIN="$(d="$PWD"; while [ "$d" != / ] && [ ! -e "$d/.brainroot" ]; do d="$(dirn
 ## 規範
 - 一則 note 一個想法(原子化);過長就拆。
 - 連結在 ingest 時建好(非查詢時),這是跟 RAG 的根本差別。
-- 全程繁體中文。
+- 用你 brain 的慣用語言撰寫。
