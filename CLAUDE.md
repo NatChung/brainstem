@@ -13,20 +13,21 @@ BRAIN="$(d="$PWD"; while [ "$d" != / ] && [ ! -e "$d/.brainroot" ]; do d="$(dirn
 
 ## 首次設定(對話式 onboarding)
 **每次 session 載入都先讀根目錄 `lens.md`**——若仍含 `<!-- LENS_UNCONFIGURED -->`,在執行使用者任何請求之前先跑以下 onboarding。
-未設定判準:根 `lens.md` 仍含 `<!-- LENS_UNCONFIGURED -->`。
 
-skills 已在 repo 內、**開 repo 即可用**(`/ingest`·`/query`·`/synthesize`),**不必安裝**。三步:
+skills 已在 repo 內、**開 repo 即可用**(`/brainstem-ingest`·`/brainstem-query`·`/brainstem-synthesize`),**不必安裝**。你的 note 存在這個 repo 的 `./notes/`、entities 在 `./entities/`。
 
-1. **填 lens**:訪談使用者,**用具體情境提問、不要用術語當題目**。三組各問一題:
-   - 我怎麼判斷:「讀一篇文章 / 看一個新工具時,什麼會讓你**信它 / 不信它**?」
-   - 我的偏好:「你希望這顆腦幫你**留下什麼**——哪種素材對你最有用?」
-   - 語氣:「產出的文章該**像誰在說話**?有沒有不准用的詞 / 一定要的口吻?」
-   每組都附 escape-hatch:「**或直接說『我貼 lens』**,把你寫好的判準貼上來,跳過訪談。」
-   把回答寫進 `lens.md`,並**移除 `<!-- LENS_UNCONFIGURED -->` 那行**。
-2. **餵第一個來源**:用 `ingest` skill 餵一個 URL 或一段貼上的想法,建第一則 note。
+**先看有沒有既有圖**:若 `./notes/` 已有**非 seed** 的 `.md`(seed = 僅 `atomic-note-one-idea.md` + `brainstem.md`)→ 印「找到既有 N 則 note,沿用這個腦、不重建」,跳過第 2 步的「建第一則」概念、直接確認 lens(若 sentinel 仍在才走第 1 步訪談)→ 第 3 步體檢。否則走完整三步:
+
+1. **填 lens**——lens 改變三件事:**ingest 收料**抽什麼/留什麼、**query 查**時先浮什麼、**synthesize 寫**時什麼口吻。三題各對一件,**每題給範例 + 一條【推薦】,不知道就用推薦的**:
+   - **(收料)什麼該留、什麼是雜訊?** 例:留可操作判準丟鋪陳 · 留反直覺丟常識 · **【推薦】先都留,之後再篩**
+   - **(查)回來問時最想先看到什麼?** **【推薦】先給結論 + 關鍵 note** · 先給反方/不同角度 · 先給原始出處
+   - **(寫)要像誰在說話?** **【推薦】第一人稱、直白、不誇大** · 條列極簡 · 像教學帶例子
+
+   出口三選一:挑範例 / 說「**用推薦的**」(整步可「**全用推薦**」一句帶過)/ 說「**我貼 lens**」貼現成的。把回答寫進 `lens.md` 對應三段(收料時 / 查時 / 寫時),**移除 `<!-- LENS_UNCONFIGURED -->` 那行**。「全用推薦」= 三段各寫:收料「先都留,之後再篩」/ 查「先給結論 + 幾個關鍵 note」/ 寫「第一人稱、直白、不誇大」。
+2. **餵第一個來源**:用 `brainstem-ingest` 餵一個 URL 或一段貼上的想法,建第一則 note。
 3. **體檢**:`bun run brain`,確認 0 孤島 / 0 斷鏈。
 
-> 進階:想在**別的 repo** 也能呼叫這顆腦 → 跑 `bash install.sh`(全域裝進 `~/.claude/skills/`,**需重開 session** 才生效)。本 repo 內不需要。
+> 進階:想在**別的 repo** 也能呼叫這顆腦 → 跑 `bash install.sh`(全域裝 `~/.claude/skills/brainstem-*`,**需重開 session**)。先前裝過(任何舊版/前綴)的全域 symlink 在 skill 改名後會斷,重跑一次 `install.sh` 即可。本 repo 內不需要。
 
 ## 原子筆記紀律
 - 一則 note 一個想法;過長就拆。
@@ -37,7 +38,7 @@ skills 已在 repo 內、**開 repo 即可用**(`/ingest`·`/query`·`/synthesiz
 ## 工具
 - `bun run brain` — 體檢(規模/成熟度/圖健康/sensitive/log 大小);`bun run brain --dup <來源>` 去重。
 - `bun run doctor` — 環境體檢(`.brainroot` / `lens.md` 是否設定 / `yt-dlp`·whisper 提示),紅項缺 → exit 1。
-- 三個 skill:`ingest`(餵料)/`query`(查)/`synthesize`(產草稿)。
+- 三個 skill:`brainstem-ingest`(餵料)/`brainstem-query`(查)/`brainstem-synthesize`(產草稿)。
 
 ## 語言政策
 - CLAUDE.md 本身與 skill 指令用中文撰寫。
