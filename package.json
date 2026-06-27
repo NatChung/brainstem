@@ -1,9 +1,5 @@
 {
   "name": "brainstem",
   "private": false,
-  "type": "module",
-  "scripts": {
-    "brain": "bun check.mjs",
-    "doctor": "bun doctor.mjs"
-  }
+  "type": "module"
 }
