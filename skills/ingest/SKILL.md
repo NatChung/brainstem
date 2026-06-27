@@ -20,7 +20,7 @@ BRAIN="$(d="$PWD"; while [ "$d" != / ] && [ ! -e "$d/.brainroot" ]; do d="$(dirn
 
 ## 流程(一個來源通常觸 5-15 頁)
 1. **讀來源**:`sources/` 檔 → 直接讀;URL → WebFetch;貼進的想法 → 直接用;他 repo → 讀相關檔。
-   - **(進階/選用,需 yt-dlp + 平台對應 whisper) YouTube**:先 `yt-dlp` 抓官方/自動字幕(零成本最準)。**真的沒字幕**才 fallback:`yt-dlp -x` 下音檔 → 用「當下這台機器跑得動的」whisper 轉錄(Mac=`mlx-whisper`、Win/Linux=`faster-whisper`/`openai-whisper`,別寫死)→ 存進 `$BRAIN/sources/transcripts/`。whisper 是音轉文,**專有名詞會聽錯(如 Claude→"Cloud"),抽概念前先人工校正**。
+   - **YouTube**:先 `yt-dlp` 抓官方/自動字幕(零成本最準、**最常見路徑**)。**真的沒字幕**才 fallback(進階):`yt-dlp -x` 下音檔 → whisper 轉錄。注意 **yt-dlp(下載)和 whisper(轉錄)是兩個不同工具**;whisper 用「當下這台機器跑得動的」(Mac=`mlx-whisper`、Win/Linux=`faster-whisper`,**別寫死**)→ 存進 `$BRAIN/sources/transcripts/`。whisper 是音轉文,專有名詞會聽錯(如 Claude→"Cloud"),抽概念前先人工校正。
 2. **抽取**:先讀 `$BRAIN/lens.md`,讓萃取與取捨朝使用者判準偏。列出此來源的(a)原子概念(一個概念一則 note)、(b)提到的 entities(人/組織/產品/工具)。
 3. **比對既有圖**(概念層級;來源層級去重已在前置 4 做):對每個概念/entity,先 `ls $BRAIN/notes $BRAIN/entities` + grep 既有 title/slug,**有就更新、無才新建**(避免重複節點)。
 4. **建頁**:用 `$BRAIN/_templates/note.md`(或 `entity.md`)為骨,寫進 `$BRAIN/notes/<slug>.md`。新 note `status: seedling`。

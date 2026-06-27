@@ -10,13 +10,13 @@
 ## 安裝
 1. `git clone <repo> ~/your-brain && cd ~/your-brain`
 2. 用 Claude Code 從這個資料夾開啟,直接說「hi」。
-3. 它讀 `CLAUDE.md` 帶你走 onboarding:全域裝 skills(可加前綴)→ 填 `lens.md` → 餵第一個來源 → `bun run brain` 綠燈。
+3. 它讀 `CLAUDE.md` 帶你走 onboarding:**填 `lens.md` → 餵第一個來源 → `bun run brain` 綠燈**。skills 開 repo 即用,免裝。
 
-需求:[Bun](https://bun.sh)(跑 `check.mjs`)、Claude Code。
+需求:[Bun](https://bun.sh)、Claude Code。先跑 `bun run doctor` 檢查環境就緒。
 
 ## Quickstart:餵第一個來源
-- 貼一段想法,或給一個文章 URL,跟 Claude 說「ingest 這個」。
-- 進階(選用):YouTube 無字幕影片可下音檔用 whisper 轉錄再餵(需 `yt-dlp` + 平台對應 whisper)。
+- 貼一段想法、給一個文章 **URL**,或一支 **YouTube 影片**——跟 Claude 說「ingest 這個」。
+- YouTube:**有字幕**的影片 `yt-dlp` 直接抓字幕(輕、快、最常見)。**無字幕**才需轉錄——`yt-dlp` 下音檔 → whisper 轉文字(**yt-dlp 和 whisper 是兩個不同工具**);whisper **依你的 OS**(Mac=`mlx-whisper`、Win/Linux=`faster-whisper`),屬進階。
 
 ## 結構
 - `notes/` 原子筆記(`[[wikilink]]` 互連)· `entities/` 人/組織/產品/工具
