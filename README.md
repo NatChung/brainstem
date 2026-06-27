@@ -21,7 +21,7 @@
 ## 結構
 - `notes/` 原子筆記(`[[wikilink]]` 互連)· `entities/` 人/組織/產品/工具
 - `lens.md` 你的判準 · `docs/drafts/` 合成草稿 · `check.mjs` 體檢/去重
-- skills:`ingest` / `query` / `synthesize`
+- skills:`brainstem-ingest` / `brainstem-query` / `brainstem-synthesize`
 
 ## License
 MIT
