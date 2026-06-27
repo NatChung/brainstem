@@ -49,7 +49,8 @@ const arr = (f, k) => {
   if (!v) return [];
   return [...v.matchAll(/["[]?([^"\[\],]+)["\]]?/g)].map((x) => x[1].trim()).filter((x) => x && x !== "[" && x !== "]");
 };
-const wl = (raw) => [...raw.matchAll(/\[\[([^\]]+)\]\]/g)].map((m) => m[1]);
+const stripCode = (raw) => raw.replace(/```[\s\S]*?```/g, "").replace(/`[^`\n]*`/g, "");
+const wl = (raw) => [...stripCode(raw).matchAll(/\[\[([^\]]+)\]\]/g)].map((m) => m[1]);
 
 const slugs = new Set(ALL.map((x) => x.slug));
 const backlink = {}, outdeg = {}, broken = [];
