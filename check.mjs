@@ -6,6 +6,7 @@
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { findBrain } from "./lib/find-brain.mjs";
+import { resolveDrafts } from "./lib/drafts.mjs";
 
 const BRAIN = findBrain();
 if (!BRAIN) { process.stderr.write("找不到腦 — cd 進一顆,或 brainstem init/use。\n"); process.exit(1); }
@@ -69,7 +70,8 @@ NOTES.forEach((n) => {
   arr(f, "tags").forEach((t) => (tags[t] = (tags[t] || 0) + 1));
 });
 const sensitive = ALL.filter((x) => field(fm(x.raw), "sensitive") === "true").length;
-const drafts = existsSync(join(BRAIN, "docs/drafts")) ? readdirSync(join(BRAIN, "docs/drafts")).filter((f) => f.endsWith(".md")).length : 0;
+const draftsDir = resolveDrafts();
+const drafts = draftsDir && existsSync(draftsDir) ? readdirSync(draftsDir).filter((f) => f.endsWith(".md")).length : 0;
 const logLines = existsSync(join(BRAIN, "log.md")) ? readFileSync(join(BRAIN, "log.md"), "utf8").split("\n").filter((l) => l.trim()).length : 0;
 const top = (o, n) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, n);
 
