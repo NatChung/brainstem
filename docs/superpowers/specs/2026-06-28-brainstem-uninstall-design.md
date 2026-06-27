@@ -48,7 +48,7 @@ CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/brainstem"
 | CLI | `$BIN/brainstem` | dispatcher 單檔(**不刪** `$BIN` 父目錄) |
 | 全域設定 | `$CONFIG_HOME` | 整個 `~/.config/brainstem`(含 `config.json` = 腦指標 + draftsDir) |
 
-- 用 `rm -rf`(目錄)/ `rm -f`(單檔):對不存在路徑回 0,與 `set -e` 相容,故可反覆執行、第二次仍 exit 0。
+- **一律用 `rm -rf`**(目錄與單檔皆可,含 `$BIN/brainstem` 單檔):對不存在路徑回 0,與 `set -e` 相容,故可反覆執行、第二次仍 exit 0。
 - **skill 清單 drift**:`brainstem-{ingest,query,synthesize}` 此清單已硬編在 `install.sh`(安裝迴圈)與 `test-install.sh`;uninstall + test-uninstall 會成第三、四處。本輪沿用硬編,但在 `install.sh` 該迴圈上方加註解:「**新增 skill 時,install / uninstall / test-install / test-uninstall 四處清單同步**」。
 
 ### 刪除前防呆
@@ -66,13 +66,34 @@ safe_rm() {  # $1 = 路徑;結尾須含 brainstem 字樣才刪
 
 `$BIN/brainstem` 結尾為 `/brainstem`、`$ENGINE_HOME`/`$CONFIG_HOME` 同；三個 skill 結尾為 `/brainstem-*`,全部通過白名單。
 
+**防護邊界(明載,免後續維護者誤信)**:此白名單**只驗後綴、不驗前綴**。它擋得住「結尾完全不像 brainstem」的離譜值(如 env 異常使路徑變 `/` → 不匹配 → exit 1),但**擋不住「結尾像、前綴是錯目錄」**(如 `XDG_DATA_HOME` 被設成某重要目錄時的 `<那目錄>/brainstem`)。因 `safe_rm` 的輸入永遠是受控的 4 條固定路徑、不接外部輸入,實務風險低;此防呆定位是「擋離譜空值」,**非**「擋使用者把 XDG 指到錯地方」。
+
+### `do_uninstall` 函式(逐字,收尾訊息單一來源)
+
+```bash
+do_uninstall() {
+  for p in "$ENGINE_HOME" \
+           "$SKILLS/brainstem-ingest" "$SKILLS/brainstem-query" "$SKILLS/brainstem-synthesize" \
+           "$BIN/brainstem" \
+           "$CONFIG_HOME"; do
+    if [ -e "$p" ]; then safe_rm "$p"; echo "removed  $p"
+    else echo "skip     $p(不存在)"; fi
+  done
+  echo
+  echo "brainstem 引擎已移除。腦資料未動。"
+  echo "重裝:bash install.sh"
+  echo "腦仍在,重指:brainstem use <你的腦目錄>"
+  echo "若重測仍偵測到腦:檢查是否 export 了 \$BRAIN_DIR,或換到非腦目錄再開 session。"
+}
+```
+
+- `[ -e "$p" ]` 守衛只為輸出區分 `removed` vs `skip(不存在)`(對應第二次 idempotent 跑);不影響安全(刪仍走 `safe_rm` 白名單)。
+- skill 三項清單在此為第三處硬編(install 迴圈、test-install、此處、test-uninstall 共四處),受 §移除清單的 drift 註解約束。
+
 ## 安全 / 使用者須知
 
 - **只刪上述固定引擎路徑,不碰腦資料。**
-- 結尾印:
-  - `腦資料未動。`
-  - `重裝:bash install.sh`
-  - `腦仍在,重指:brainstem use <你的腦目錄>`
+- **收尾 4 行訊息由 `do_uninstall` 單一來源印出**(見上):腦資料未動 / 重裝指令 / 重指腦指令 / onboarding 自查提示。
 - **不做互動確認**:此功能用於反覆重測,prompt 礙事;移除可逆(重跑 install)。
 
 ### ⚠️ 觸發 onboarding 的前提(對照 `lib/find-brain.mjs`)
