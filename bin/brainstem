@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# brainstem CLI — 純分派。ENGINE_HOME 由 XDG 在 runtime 計算(不 bake repo 路徑)。
+set -euo pipefail
+ENGINE_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/brainstem"
+cmd="${1:-}"; [ "$#" -gt 0 ] && shift || true
+case "$cmd" in
+  where)        exec bun "$ENGINE_HOME/lib/find-brain.mjs" ;;
+  use)          exec bun "$ENGINE_HOME/lib/config.mjs" set "$@" ;;
+  init)         exec bun "$ENGINE_HOME/init.mjs" "$@" ;;
+  check)        exec bun "$ENGINE_HOME/check.mjs" "$@" ;;
+  doctor)       exec bun "$ENGINE_HOME/doctor.mjs" "$@" ;;
+  --version|-v) cat "$ENGINE_HOME/VERSION" ;;
+  ""|--help|-h) printf 'brainstem <where | use <dir> | init <dir> | check [--dup <src>] | doctor | --version>\n' ;;
+  *)            printf 'unknown subcommand: %s\n' "$cmd" >&2; exit 1 ;;
+esac
