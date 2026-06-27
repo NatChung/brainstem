@@ -1,0 +1,11 @@
+# secrets (predefined slot; engine has none today)
+.env
+# tooling scratch
+.superpowers/
+# macOS
+.DS_Store
+# audio from yt-dlp no-caption path (transcripts .txt are kept)
+*.mp3
+*.m4a
+*.wav
+*.webm
