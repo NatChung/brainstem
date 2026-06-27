@@ -16,6 +16,8 @@ BRAIN="$(d="$PWD"; while [ "$d" != / ] && [ ! -e "$d/.brainroot" ]; do d="$(dirn
 
 skills 已在 repo 內、**開 repo 即可用**(`/brainstem-ingest`·`/brainstem-query`·`/brainstem-synthesize`),**不必安裝**。你的 note 存在這個 repo 的 `./notes/`、entities 在 `./entities/`。
 
+**第 0 步:環境預檢**——先跑 `bun run doctor` 確認環境就緒(`.brainroot` / `lens.md` 設定了沒 / `yt-dlp` / whisper)。紅項缺先照它的提示補(doctor 唯讀、只檢查不動東西)。過了再往下。
+
 **先看有沒有既有圖**:若 `./notes/` 已有**非 seed** 的 `.md`(seed = `notes/` 只有 `atomic-note-one-idea.md`;示範 entity `brainstem.md` 在 `entities/`)→ 印「找到既有 N 則 note,沿用這個腦、不重建」,跳過第 2 步的「建第一則」概念 → 接著:若 `lens.md` 仍含 sentinel 就走第 1 步訪談,否則跳過 → 第 3 步體檢。否則走完整三步:
 
 1. **填 lens**——lens 改變三件事:**ingest 收料**抽什麼/留什麼、**query 查**時先浮什麼、**synthesize 寫**時什麼口吻。三題各對一件,**每題給範例 + 一條【推薦】,不知道就用推薦的**:
