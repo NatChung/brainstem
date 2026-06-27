@@ -36,6 +36,7 @@ skills 已在 repo 內、**開 repo 即可用**(`/ingest`·`/query`·`/synthesiz
 
 ## 工具
 - `bun run brain` — 體檢(規模/成熟度/圖健康/sensitive/log 大小);`bun run brain --dup <來源>` 去重。
+- `bun run doctor` — 環境體檢(`.brainroot` / `lens.md` 是否設定 / `yt-dlp`·whisper 提示),紅項缺 → exit 1。
 - 三個 skill:`ingest`(餵料)/`query`(查)/`synthesize`(產草稿)。
 
 ## 語言政策

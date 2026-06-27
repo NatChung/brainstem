@@ -28,7 +28,8 @@ info(`Bun ${Bun.version}`);
 Bun.which("yt-dlp") ? ok("yt-dlp 可用(YouTube 抓字幕)") : warn("yt-dlp 未裝(YouTube 來源需要)— 裝:brew install yt-dlp 或 pipx install yt-dlp");
 
 // optional(灰)
-const whisper = process.platform === "darwin" ? "mlx-whisper(Apple Silicon)" : "faster-whisper(CUDA/CPU)";
+const appleSilicon = process.platform === "darwin" && process.arch === "arm64";
+const whisper = appleSilicon ? "mlx-whisper(Apple Silicon)" : "faster-whisper(CUDA/CPU)";
 info(`whisper(只無字幕影片才需要):你的 OS 建議用 ${whisper}`);
 
 console.log(red ? `\n${red} 項必檢未過 ✗` : "\n全部就緒 ✓");
