@@ -12,13 +12,21 @@ BRAIN="$(d="$PWD"; while [ "$d" != / ] && [ ! -e "$d/.brainroot" ]; do d="$(dirn
 ```
 
 ## 首次設定(對話式 onboarding)
-**每次 session 載入都先讀根目錄 `lens.md`**——若仍含 `<!-- LENS_UNCONFIGURED -->`,在執行使用者任何請求之前先跑以下 onboarding 步驟。
-未設定的判準:根 `lens.md` 仍含 `<!-- LENS_UNCONFIGURED -->`。
-步驟:
-1. **裝 skills(全域)**:問使用者要不要把 `skills/*` symlink 進 `~/.claude/skills/`,以及要不要加前綴(預設無;要同機跑多顆腦或測試就加,例 `test` → `test-ingest`)。執行 `bash install.sh [前綴]`。
-2. **填 lens**:打開 `lens.md`,訪談使用者「你怎麼判斷、偏好什麼、語氣」,寫進去並**移除 `<!-- LENS_UNCONFIGURED -->` 那行**。
-3. **餵第一個來源**:用 `ingest` skill 餵一個 URL 或一段貼上的想法,建第一則 note。⚠️ 透過 `install.sh` 全域安裝的 skill 要下一個 Claude Code session 才可直接呼叫——**本 session 第一次 ingest 請直接照 `skills/ingest/SKILL.md` 執行**(它在 repo 內、已自動載入);全域 `ingest`/`query`/`synthesize` 指令從下個 session 起生效。
-4. **體檢**:`bun run brain`,確認 0 孤島 / 0 斷鏈。
+**每次 session 載入都先讀根目錄 `lens.md`**——若仍含 `<!-- LENS_UNCONFIGURED -->`,在執行使用者任何請求之前先跑以下 onboarding。
+未設定判準:根 `lens.md` 仍含 `<!-- LENS_UNCONFIGURED -->`。
+
+skills 已在 repo 內、**開 repo 即可用**(`/ingest`·`/query`·`/synthesize`),**不必安裝**。三步:
+
+1. **填 lens**:訪談使用者,**用具體情境提問、不要用術語當題目**。三組各問一題:
+   - 我怎麼判斷:「讀一篇文章 / 看一個新工具時,什麼會讓你**信它 / 不信它**?」
+   - 我的偏好:「你希望這顆腦幫你**留下什麼**——哪種素材對你最有用?」
+   - 語氣:「產出的文章該**像誰在說話**?有沒有不准用的詞 / 一定要的口吻?」
+   每組都附 escape-hatch:「**或直接說『我貼 lens』**,把你寫好的判準貼上來,跳過訪談。」
+   把回答寫進 `lens.md`,並**移除 `<!-- LENS_UNCONFIGURED -->` 那行**。
+2. **餵第一個來源**:用 `ingest` skill 餵一個 URL 或一段貼上的想法,建第一則 note。
+3. **體檢**:`bun run brain`,確認 0 孤島 / 0 斷鏈。
+
+> 進階:想在**別的 repo** 也能呼叫這顆腦 → 跑 `bash install.sh`(全域裝進 `~/.claude/skills/`,**需重開 session** 才生效)。本 repo 內不需要。
 
 ## 原子筆記紀律
 - 一則 note 一個想法;過長就拆。
