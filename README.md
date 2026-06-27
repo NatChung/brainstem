@@ -13,6 +13,7 @@
 
 ```
 請安裝:https://github.com/NatChung/brainstem
+請讀它 README 的「安裝」節照做。
 ```
 
 Claude 會讀本節指示、clone 到暫存、跑 `install.sh`、再刪掉暫存,**不留本地 clone**。
@@ -51,8 +52,23 @@ onboarding:**填 `lens.md` → 餵第一個來源 → `brainstem check` 綠燈**
 - skills:`brainstem-ingest` / `brainstem-query` / `brainstem-synthesize`
 
 ## 升級 / 移除
-重 clone + 重跑 `install.sh`;`brainstem --version` 看版號。
-移除引擎:`bash install.sh --uninstall`(清 ENGINE_HOME / skills / 全域 config,**不刪腦資料**;重開 session 可乾淨重測 onboarding)。
+升級:重跑安裝(同上,貼 `請安裝:<URL>` 或手動 `bash install.sh`),覆寫 ENGINE_HOME、bump 版本;`brainstem --version` 看版號。
+
+**移除 —— 複製下面這格,貼進 Claude Code 對話:**
+
+```
+請移除 brainstem:https://github.com/NatChung/brainstem
+請讀它 README 的「移除」節照做。
+```
+
+<!-- AI agent:使用者要移除 brainstem 時,逐字執行下面三行(本地通常已沒 clone,故先 re-clone 取得 install.sh → 跑 --uninstall → 刪暫存),完成後告訴使用者「腦資料未動」。 -->
+```bash
+git clone https://github.com/NatChung/brainstem /tmp/brainstem-uninstall
+bash /tmp/brainstem-uninstall/install.sh --uninstall
+rm -rf /tmp/brainstem-uninstall
+```
+
+清 ENGINE_HOME / skills / dispatcher / 全域 config,**不刪腦資料**;重開 session 可乾淨重測。已有本地 clone 的話,直接 `bash install.sh --uninstall` 即可。
 
 ## 從舊版遷移(舊式「clone 即腦」)
 舊 clone 根仍含 `.brainroot` 可續用:`bash install.sh` 後 `brainstem use <舊clone路徑>` 指過去,並把該 clone 設為私有。
