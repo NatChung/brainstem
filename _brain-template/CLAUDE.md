@@ -31,6 +31,7 @@
 - `brainstem check` — 體檢;`brainstem check --dup <來源>` 去重。
 - `brainstem doctor` — 環境體檢。
 - `brainstem where` / `brainstem use <dir>` — 查 / 改腦位置。
+- `brainstem drafts [<dir> | --default]` — 查 / 設 / 清 草稿落點(未設 = `$BRAIN/docs/drafts`)。
 - 三個 skill:`brainstem-ingest`(餵料)/ `brainstem-query`(查)/ `brainstem-synthesize`(產草稿)。
 
 ## 語言政策

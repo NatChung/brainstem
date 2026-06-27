@@ -22,6 +22,7 @@ onboarding:**填 `lens.md` → 餵第一個來源 → `brainstem check` 綠燈**
 ## 常用
 - `brainstem where` / `brainstem use <dir>` — 查 / 改預設腦位置
 - `brainstem check` 體檢 · `brainstem check --dup <來源>` 去重 · `brainstem doctor` 環境檢
+- `brainstem drafts [<dir> | --default]` — 查 / 設 / 清 synthesize 草稿落點(未設 = `$BRAIN/docs/drafts`)
 - skills:`brainstem-ingest` / `brainstem-query` / `brainstem-synthesize`
 
 ## 升級

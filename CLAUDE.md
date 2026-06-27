@@ -6,7 +6,7 @@
 ## 架構
 - **安裝 = 複製**(非 symlink、非 plugin):`install.sh` 把引擎複製到 `ENGINE_HOME`(`${XDG_DATA_HOME:-~/.local/share}/brainstem`)、skills 複製到 `~/.claude/skills/`、dispatcher 到 `~/.local/bin/brainstem`。裝完 repo 可刪。
 - **腦解析**:`lib/find-brain.mjs` —— `BRAIN_DIR` → cwd 上行 `.brainroot` → 全域指標 `${XDG_CONFIG_HOME:-~/.config}/brainstem/config.json` → error。`check.mjs`/`doctor.mjs`/`brainstem where` 共用它。
-- **CLI**:`bin/brainstem`(POSIX 分派)→ `where|use|init|check|doctor|--version`。
+- **CLI**:`bin/brainstem`(POSIX 分派)→ `where|use|init|check|doctor|drafts|--version`。
 - **新腦骨架**:`_brain-template/`(由 `init.mjs` 複製)。
 
 ## 本機測試
