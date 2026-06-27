@@ -27,8 +27,9 @@ onboarding:**填 `lens.md` → 餵第一個來源 → `brainstem check` 綠燈**
 - `brainstem drafts [<dir> | --default]` — 查 / 設 / 清 synthesize 草稿落點(未設 = `$BRAIN/docs/drafts`)
 - skills:`brainstem-ingest` / `brainstem-query` / `brainstem-synthesize`
 
-## 升級
+## 升級 / 移除
 重 clone + 重跑 `install.sh`;`brainstem --version` 看版號。
+移除引擎:`bash install.sh --uninstall`(清 ENGINE_HOME / skills / 全域 config,**不刪腦資料**;重開 session 可乾淨重測 onboarding)。
 
 ## 從舊版遷移(舊式「clone 即腦」)
 舊 clone 根仍含 `.brainroot` 可續用:`bash install.sh` 後 `brainstem use <舊clone路徑>` 指過去,並把該 clone 設為私有。

@@ -16,14 +16,16 @@ bash bin/test-config.sh
 bash bin/test-doctor.sh
 bash bin/test-init.sh
 bash bin/test-install.sh
+bash bin/test-uninstall.sh
 bash bin/test-skills-wiring.sh
 bash bin/test-ac4.sh
 # 手動冒煙:
 bash install.sh && brainstem init /tmp/demo-brain && (cd /tmp/demo-brain && brainstem doctor)
 ```
 
-## 升級
+## 升級 / 移除
 重 clone 最新 repo + 重跑 `install.sh`(覆寫 ENGINE_HOME、bump VERSION)。`brainstem --version` 看裝了哪版。
+移除:`bash install.sh --uninstall`(清引擎/skills/全域 config,不刪腦)。
 
 ## 語言政策
 - 本檔與 skill 指令用中文;使用者 notes/lens 語言自訂。
