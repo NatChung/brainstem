@@ -4,10 +4,11 @@
 //   bun run brain --dup <s>  → 去重:<s>(URL / 影片 id / 路徑)餵過沒(掃所有 note/entity 全文)
 // 真相源 = note/entity 檔本身;_index.md / log.md 只是人讀的指標,不是這支的依據。
 import { readFileSync, readdirSync, existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
+import { findBrain } from "./lib/find-brain.mjs";
 
-const BRAIN = dirname(fileURLToPath(import.meta.url));
+const BRAIN = findBrain();
+if (!BRAIN) { process.stderr.write("找不到腦 — cd 進一顆,或 brainstem init/use。\n"); process.exit(1); }
 const rel = p => p.replace(BRAIN + "/", "");
 const md = (d) =>
   existsSync(d)

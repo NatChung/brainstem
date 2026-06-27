@@ -3,8 +3,11 @@
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { findBrain } from "./lib/find-brain.mjs";
 
-const BRAIN = process.env.BRAIN_DIR || dirname(fileURLToPath(import.meta.url));
+const HERE = dirname(fileURLToPath(import.meta.url));
+const BRAIN = findBrain();
+if (!BRAIN) { process.stderr.write("找不到腦 — cd 進一顆,或 brainstem init/use。\n"); process.exit(1); }
 let red = 0;
 const ok = (m) => console.log(`  ✅ ${m}`);
 const fail = (m) => { console.log(`  ❌ ${m}`); red++; };
@@ -23,6 +26,9 @@ else ok("lens.md 已設定");
 
 // 資訊
 info(`Bun ${Bun.version}`);
+const verFile = join(HERE, "VERSION");
+info(`brainstem ${existsSync(verFile) ? readFileSync(verFile, "utf8").trim() : "(no VERSION)"}`);
+Bun.which("brainstem") ? ok("brainstem 指令在 PATH") : warn("brainstem 不在 PATH — 把 ~/.local/bin 加進 PATH 或重跑 install.sh");
 
 // recommended(黃)
 Bun.which("yt-dlp") ? ok("yt-dlp 可用(YouTube 抓字幕)") : warn("yt-dlp 未裝(YouTube 來源需要)— 裝:brew install yt-dlp 或 pipx install yt-dlp");
