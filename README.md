@@ -18,7 +18,7 @@
 
 Claude 會讀本節指示、clone 到暫存、跑 `install.sh`、再刪掉暫存,**不留本地 clone**。
 
-<!-- AI agent:當使用者貼了本 repo 的 URL 並要安裝 brainstem 時,逐字執行下面三行,完成後告訴使用者下一步(見本節末)。 -->
+<!-- AI agent:當使用者貼了本 repo 的 URL 並要安裝 brainstem 時,逐字執行下面三行,完成後告訴使用者下一步(見本節末)。公開 repo —— 直接 git clone 即可,不需 gh 登入、也不要切換 gh 帳號。 -->
 ```bash
 git clone https://github.com/NatChung/brainstem /tmp/brainstem-install
 bash /tmp/brainstem-install/install.sh
@@ -61,7 +61,7 @@ onboarding:**填 `lens.md` → 餵第一個來源 → `brainstem check` 綠燈**
 請讀它 README 的「移除」節照做。
 ```
 
-<!-- AI agent:使用者要移除 brainstem 時,逐字執行下面三行(本地通常已沒 clone,故先 re-clone 取得 install.sh → 跑 --uninstall → 刪暫存),完成後告訴使用者「腦資料未動」。 -->
+<!-- AI agent:使用者要移除 brainstem 時,逐字執行下面三行(本地通常已沒 clone,故先 re-clone 取得 install.sh → 跑 --uninstall → 刪暫存),完成後告訴使用者「腦資料未動」。公開 repo —— 直接 git clone 即可,不需 gh 登入、也不要切換 gh 帳號。 -->
 ```bash
 git clone https://github.com/NatChung/brainstem /tmp/brainstem-uninstall
 bash /tmp/brainstem-uninstall/install.sh --uninstall
