@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // brain 體檢 + 去重工具。唯讀,不改圖。
-//   bun run brain            → 健康報告(規模/成熟度/來源/主題/圖健康/合規/log 大小)
-//   bun run brain --dup <s>  → 去重:<s>(URL / 影片 id / 路徑)餵過沒(掃所有 note/entity 全文)
+//   brainstem check            → 健康報告(規模/成熟度/來源/主題/圖健康/合規/log 大小)
+//   brainstem check --dup <s>  → 去重:<s>(URL / 影片 id / 路徑)餵過沒(掃所有 note/entity 全文)
 // 真相源 = note/entity 檔本身;_index.md / log.md 只是人讀的指標,不是這支的依據。
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
@@ -29,7 +29,7 @@ const dupIdx = args.findIndex((a) => a === "--dup" || a === "--source" || a === 
 if (dupIdx !== -1) {
   const term = (args[dupIdx + 1] || "").trim();
   if (!term) {
-    console.error("用法: bun run brain --dup <url | 影片id | 路徑>");
+    console.error("用法: brainstem check --dup <url | 影片id | 路徑>");
     process.exit(2);
   }
   const hits = ALL.filter((x) => x.raw.includes(term));

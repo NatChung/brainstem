@@ -29,6 +29,7 @@ onboarding:**填 `lens.md` → 餵第一個來源 → `brainstem check` 綠燈**
 
 ## 從舊版遷移(舊式「clone 即腦」)
 舊 clone 根仍含 `.brainroot` 可續用:`bash install.sh` 後 `brainstem use <舊clone路徑>` 指過去,並把該 clone 設為私有。
+⚠️ 不要直接 `git pull` 這個引擎 repo 進你舊的「腦 clone」(會把根的 `.brainroot` 等改掉);請改用「clone 一份新的當引擎 + `brainstem use <舊腦路徑>`」。
 
 ## License
 MIT
