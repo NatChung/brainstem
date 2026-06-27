@@ -2,8 +2,8 @@
 import { existsSync, mkdirSync, cpSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { setBrain } from "./lib/config.mjs";
-import { configPath } from "./lib/find-brain.mjs";
+import { setBrain, currentBrain } from "./lib/config.mjs";
+import { draftsPinnedNotice } from "./lib/drafts.mjs";
 
 const ENGINE = dirname(fileURLToPath(import.meta.url));
 const TEMPLATE = join(ENGINE, "_brain-template");
@@ -23,6 +23,7 @@ mkdirSync(abs, { recursive: true });
 cpSync(TEMPLATE, abs, { recursive: true });
 process.stdout.write(`已建立腦:${abs}\n`);
 
-if (!existsSync(configPath())) setBrain(abs);
+if (!currentBrain()) setBrain(abs);
+else { const n = draftsPinnedNotice(); if (n) process.stdout.write(n + "\n"); }
 
 process.stdout.write(`下一步:cd ${abs},用 Claude Code 開啟說 hi 走 onboarding。建議 git init + 設私有 remote。\n`);
