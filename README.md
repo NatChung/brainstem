@@ -12,6 +12,8 @@ git clone <repo> && cd brainstem && bash install.sh
 ```
 複製 skills + 引擎 + `brainstem` CLI 到全域。**裝完這個 repo 可以刪。** 需求:[Bun](https://bun.sh)、Claude Code。若提示 `~/.local/bin` 不在 PATH,照提示加進 shell rc。
 
+> **`brainstem: command not found`?** 引擎還沒裝(或 `~/.local/bin` 不在 PATH)。在這個 repo 跑 `bash install.sh`。沒有 `brainstem` 就沒有 `doctor` 可體檢 —— 安裝是第 0 步。
+
 ## 開一顆腦(私有)
 ```bash
 brainstem init ~/mybrain      # 建議放私有處 / 設私有 git remote

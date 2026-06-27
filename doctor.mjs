@@ -27,7 +27,7 @@ console.log(`brain: ${BRAIN}`);
 existsSync(join(BRAIN, ".brainroot")) ? ok(".brainroot 存在") : fail(".brainroot 不存在 — 這裡不是 brain 根");
 const lensPath = join(BRAIN, "lens.md");
 if (!existsSync(lensPath)) fail("lens.md 不存在");
-else if (readFileSync(lensPath, "utf8").includes("LENS_UNCONFIGURED")) fail("lens.md 尚未設定(仍含 LENS_UNCONFIGURED)— 先填 lens");
+else if (readFileSync(lensPath, "utf8").includes("LENS_UNCONFIGURED")) fail(`lens.md 尚未設定 — 讀 ${lensPath} 跑對話式 onboarding 填三段(要最快就說「全用推薦」,填完移除 LENS_UNCONFIGURED 那行)`);
 else ok("lens.md 已設定");
 
 // 資訊
