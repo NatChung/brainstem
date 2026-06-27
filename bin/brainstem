@@ -9,7 +9,19 @@ case "$cmd" in
   init)         exec bun "$ENGINE_HOME/init.mjs" "$@" ;;
   check)        exec bun "$ENGINE_HOME/check.mjs" "$@" ;;
   doctor)       exec bun "$ENGINE_HOME/doctor.mjs" "$@" ;;
+  drafts)
+    if [ "$#" -gt 1 ]; then printf 'brainstem drafts 只收一個參數\n' >&2; exit 1
+    elif [ "$#" -eq 0 ]; then exec bun "$ENGINE_HOME/lib/drafts.mjs"
+    elif [ "$1" = "--default" ]; then exec bun "$ENGINE_HOME/lib/config.mjs" unset-drafts
+    else exec bun "$ENGINE_HOME/lib/config.mjs" set-drafts "$1"; fi ;;
   --version|-v) cat "$ENGINE_HOME/VERSION" ;;
-  ""|--help|-h) printf 'brainstem <where | use <dir> | init <dir> | check [--dup <src>] | doctor | --version>\n' ;;
+  ""|--help|-h) printf '%s\n' \
+    'brainstem where                     印目前的腦路徑' \
+    'brainstem use <dir>                 設預設腦(需 .brainroot)' \
+    'brainstem init <dir>                從範本開新腦' \
+    'brainstem check [--dup <src>]       體檢 / 去重' \
+    'brainstem doctor                    環境預檢' \
+    'brainstem drafts [<dir>|--default]  查 / 設 / 清 草稿落點' \
+    'brainstem --version                 印引擎版號' ;;
   *)            printf 'unknown subcommand: %s\n' "$cmd" >&2; exit 1 ;;
 esac
