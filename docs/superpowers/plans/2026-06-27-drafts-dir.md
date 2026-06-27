@@ -302,8 +302,10 @@ OUT="$(brainstem drafts)"                    # get(免腦,pinned)
 [ "$OUT" = "$D" ] || { echo "FAIL: drafts get got '$OUT'"; exit 1; }
 if brainstem drafts a b >/dev/null 2>&1; then echo "FAIL: extra args should error"; exit 1; fi
 
-brainstem init "$TMP/brain" >/dev/null       # 開一顆腦(draftsDir 已設→init 仍設 brain key)
-brainstem drafts --default >/dev/null        # 清回跟腦
+# 用 brainstem use 設腦(T2 的 read-merge-write,T3 當下就可用;不依賴 T5 的 init 修正)
+mkdir -p "$TMP/brain" && : > "$TMP/brain/.brainroot"
+brainstem use "$TMP/brain" >/dev/null        # read-merge-write → {draftsDir, brain} 都在
+brainstem drafts --default >/dev/null        # 清 draftsDir → {brain}
 OUT="$(brainstem drafts)"
 [ "$OUT" = "$TMP/brain/docs/drafts" ] || { echo "FAIL: after --default should follow brain, got '$OUT'"; exit 1; }
 echo "PASS"
@@ -390,7 +392,7 @@ Add the import after the existing `import { findBrain } from "./lib/find-brain.m
 ```js
 import { resolveDrafts } from "./lib/drafts.mjs";
 ```
-Replace line 72:
+Replace line 72(整行 —— 該行內含**兩處** `join(BRAIN,"docs/drafts")`,`existsSync(...)` 與 `readdirSync(...)` 各一,下面的替換一次蓋掉兩處):
 ```js
 const drafts = existsSync(join(BRAIN, "docs/drafts")) ? readdirSync(join(BRAIN, "docs/drafts")).filter((f) => f.endsWith(".md")).length : 0;
 ```
@@ -473,7 +475,7 @@ with:
 const BRAIN = findBrain();
 const pinnedDrafts = pinnedDraftsDir();
 if (!BRAIN) {
-  if (pinnedDrafts) console.log(`drafts: ${pinnedDrafts}(pinned,目前無腦)`);
+  if (pinnedDrafts) console.log(`  ·  drafts: ${pinnedDrafts}(pinned,目前無腦)`);  // 對齊 info() 的 ·  前綴
   process.stderr.write("找不到腦 — cd 進一顆,或 brainstem init/use。\n");
   process.exit(1);
 }
@@ -550,17 +552,18 @@ After the locate-brain fenced block (ends at line 13), the line 15 currently rea
 ```
 Replace it with:
 ```markdown
-產出落點 = `brainstem drafts` 解析的目錄(未設 draftsDir → 預設 `$BRAIN/docs/drafts/`):
+產出落點 = `brainstem drafts` 解析的目錄(未設 draftsDir → 預設同腦的 `docs/drafts/`):
 ```bash
 DRAFTS="$(brainstem drafts)" || exit 1
 ```
+(刻意不寫 `$BRAIN/docs/drafts` 字面 —— 該字串已被 wiring 測試列為禁用)
 ```
 Then apply these in-place replacements:
 - Line 20 `先掃 \`$BRAIN/docs/drafts/\`` → `先掃 \`$DRAFTS/\``
 - Line 24 `**寫草稿** → \`$BRAIN/docs/drafts/<slug>.md\`` → `**寫草稿** → \`$DRAFTS/<slug>.md\`(寫前先 \`mkdir -p "$DRAFTS"\`)`
 - Line 39 `→ docs/drafts/<slug>.md(待 review)` → `→ $DRAFTS/<slug>.md(待 review)`
 - Line 40 `草稿在 \`docs/drafts/\`` → `草稿在 \`$DRAFTS/\``
-- Line 3 (description) `落到 docs/drafts/` → `落到設定的 drafts 目錄(預設 $BRAIN/docs/drafts/)`
+- Line 3 (description) `落到 docs/drafts/` → `落到設定的 drafts 目錄(預設同腦的 docs/drafts/)`(同樣避開 `$BRAIN/docs/drafts` 禁用字串)
 
 - [ ] **Step 4: Run it, verify it passes**
 
