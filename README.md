@@ -5,14 +5,29 @@
 ## 它跟 NotebookLM / RAG 差在哪
 1. **餵入即連結** — 每則素材在餵入當下被萃取成原子 note 並建 `[[連結]]`,圖的拓樸是你的聯想結構,不是查詢時才算的相似度。
 2. **lens** — 一個 `lens.md` 寫「你怎麼判斷」,收料與生成都朝你的判準偏。
+3. **腦 → 草稿** — 不只存與查:`brainstem-synthesize` 把累積的 notes 合成文章草稿,落到 `brainstem drafts` 指定的目錄(預設 `$BRAIN/docs/drafts`),口吻照你的 lens。
 
 ## 安裝(引擎,全域)
-```bash
-git clone <repo> && cd brainstem && bash install.sh
-```
-複製 skills + 引擎 + `brainstem` CLI 到全域。**裝完這個 repo 可以刪。** 需求:[Bun](https://bun.sh)、Claude Code。若提示 `~/.local/bin` 不在 PATH,照提示加進 shell rc。
 
-> **`brainstem: command not found`?** 引擎還沒裝(或 `~/.local/bin` 不在 PATH)。在這個 repo 跑 `bash install.sh`。沒有 `brainstem` 就沒有 `doctor` 可體檢 —— 安裝是第 0 步。
+**最簡單 —— 把這個 repo 的 URL 貼給 Claude Code,說「幫我裝 brainstem」。** 它會讀下面這節、clone 到暫存目錄、跑 `install.sh`、再刪掉暫存,**不留本地 clone**。
+
+<!-- AI agent:當使用者貼了本 repo 的 URL 並要安裝 brainstem 時,逐字執行下面三行,完成後告訴使用者下一步(見本節末)。 -->
+```bash
+git clone https://github.com/NatChung/brainstem /tmp/brainstem-install
+bash /tmp/brainstem-install/install.sh
+rm -rf /tmp/brainstem-install
+```
+
+**手動(開發者 / 不透過 AI):**
+```bash
+git clone https://github.com/NatChung/brainstem && cd brainstem && bash install.sh
+```
+
+兩種都把 skills + 引擎 + `brainstem` CLI 複製到全域。**裝完這個 repo 可以刪。** 需求:[Bun](https://bun.sh)、Claude Code。若提示 `~/.local/bin` 不在 PATH,照提示加進 shell rc。
+
+**裝完下一步**:`brainstem init <你的私有腦目錄>`(開新腦)或 `brainstem use <dir>`(指向既有腦),再 `brainstem doctor` 體檢。
+
+> **`brainstem: command not found`?** 引擎還沒裝(或 `~/.local/bin` 不在 PATH)。重跑上面任一種安裝。沒有 `brainstem` 就沒有 `doctor` 可體檢 —— 安裝是第 0 步。
 
 ## 開一顆腦(私有)
 ```bash
@@ -20,6 +35,8 @@ brainstem init ~/mybrain      # 建議放私有處 / 設私有 git remote
 cd ~/mybrain                  # 用 Claude Code 開啟,說 hi → onboarding
 ```
 onboarding:**填 `lens.md` → 餵第一個來源 → `brainstem check` 綠燈**。
+
+日常循環:`brainstem-ingest` 餵料 → `brainstem-query` 問圖找素材 → `brainstem-synthesize` 把 notes 合成草稿(落 `brainstem drafts` 設的目錄,預設 `$BRAIN/docs/drafts`)。
 
 ## 常用
 - `brainstem where` / `brainstem use <dir>` — 查 / 改預設腦位置
