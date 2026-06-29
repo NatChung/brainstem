@@ -41,7 +41,7 @@
 2. **clone 到 temp**:`git clone --depth 100 <url> <TEMP>`,其中 `<TEMP>` = 本 session 的 scratchpad 根目錄下 `ingest-<owner>-<repo>/`(**寫死指引,絕不落到 cwd 或 brain repo**)。`--depth 100` 限制的是**歷史深度**(供 git log / 增量 diff),不影響工作樹大小。
 3. **git log**:`git -C <temp> log` 取近期活動(誰在改、改什麼主題、最近一次 commit 距今多久 → 還活著嗎),摘要進 entity;記下 `git -C <temp> rev-parse HEAD` 的 commit SHA 與 `default_branch`。
 4. **codegraph 跑架構**:在 temp clone 內用 **codegraph CLI**(`codegraph init <TEMP>` 後 `codegraph files -p <TEMP>` / `codegraph query -p <TEMP> ...`),**不是 MCP** —— MCP 綁呼叫端 repo,會污染使用者的索引。
-   - **規模閘(init 前先做)**:`codegraph init` 索引的是 **checkout 出來的整棵樹**,與 clone depth 無關 → 巨倉 / monorepo 的 build 成本(時間 / CPU / 磁碟)可能爆掉。先用輕量探測(`git -C <TEMP> ls-files | wc -l` 或 `du -sh`)估規模;**超過上限(預設 ~5000 檔)→ 不全倉 init**,改用 `codegraph files` 鎖定少數最相關子目錄、或退回讀關鍵檔,並在回報註明「未全倉索引」。
+   - **規模閘(init 前先做)**:`codegraph init` 索引的是 **checkout 出來的整棵樹**,與 clone depth 無關 → 巨倉 / monorepo 的 build 成本(時間 / CPU / 磁碟)可能爆掉。先用輕量探測(`git -C <TEMP> ls-files | wc -l` 或 `du -sh`)估規模;**超過上限(預設 ~5000 檔)→ 不全倉 init**,改**對最相關子目錄 init 再 query**(`codegraph init <TEMP>/<subdir>` 後 `codegraph files -p <TEMP>/<subdir>`)、或退回讀關鍵檔,並在回報註明「未全倉索引」。(`codegraph files`/`query` 讀 index,沒先 init 必失敗 → 大型 repo 也須先 init 子目錄,不能直接 query 整棵樹。)
    - 規模 OK → 先抓**高層地圖**:架構一句話 + 主要模組/進入點。
    - **只對看起來可偷的招式深挖**,不做全倉 trace(控 query 輸出 token)。
 5. **web 評價**:幾條 `WebSearch`(例:`<repo> review`、`<owner>/<repo> hacker news`、`<repo> reddit`、`<repo> 踩雷 / 問題`),折成 entity 的「評價 / 實測」段 —— 當作「這招別人實測行不行」的佐證,而非花絮。

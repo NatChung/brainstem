@@ -51,7 +51,7 @@ BRAIN="$(brainstem where)" || exit 1   # where 失敗訊息已走 stderr
 2. **clone 到 temp**:`git clone --depth 100 <canonical-url> <TEMP>`,`<TEMP>` = 本 session scratchpad 根下 `ingest-<owner>-<repo>/`（**寫死走 scratchpad,絕不落到 cwd 或 `$BRAIN`**）。`--depth 100` 限歷史深度（供 git log / 增量 diff）,不影響工作樹大小。
 3. **git log**:`git -C <TEMP> log` 取近期活動（誰在改 / 改什麼主題 / 最近一次 commit 距今多久 → 還活著嗎）;記 `git -C <TEMP> rev-parse HEAD`（→ `last_commit`）與 default branch。
 4. **codegraph 架構**（用 **CLI 不用 MCP**;MCP 綁呼叫端 repo 會污染使用者索引）:
-   - **規模閘（init 前）**:`git -C <TEMP> ls-files | wc -l` 估檔數;**> ~5000 → 不全倉 init**,改 `codegraph files -p <TEMP>` 鎖定少數最相關子目錄、或退回讀關鍵檔,回報註明「未全倉索引」。
+   - **規模閘（init 前）**:`git -C <TEMP> ls-files | wc -l` 估檔數;**> ~5000 → 不全倉 init**,改**對最相關子目錄 init 再 query**（`codegraph init <TEMP>/<subdir>` → `codegraph query -p <TEMP>/<subdir> …` / `codegraph files -p <TEMP>/<subdir>`）、或退回讀關鍵檔,回報註明「未全倉索引」。(注意:`codegraph files`/`query` 讀的是 index,**沒先 init 就會失敗**,故大型 repo 也得先 init 子目錄。)
    - 規模 OK:`codegraph init <TEMP>` → `codegraph query -p <TEMP> …` / `codegraph files -p <TEMP>` 抓**高層地圖**（架構一句話 + 主要模組 / 進入點）,**只對看起來可偷的招式深挖**,不全倉 trace（控 query 輸出 token）。
 5. **web 評價**:幾條 `WebSearch`（`<repo> review`、`<owner>/<repo> hacker news`、`<repo> reddit`、`<repo> 踩雷`）,折成 entity「評價 / 實測」段,當「這招別人實測行不行」佐證。
 6. **清理**:抽取完成後 `rm -rf <TEMP>`（含 `.codegraph/`）。
@@ -68,7 +68,7 @@ BRAIN="$(brainstem where)" || exit 1   # where 失敗訊息已走 stderr
   - 有新 commit → **自動**評估增 / 修 concept note（看改動主題是否帶出新招）+ 更新 entity 的 `last_commit` / `last_ingested` / git 活動段;
   - 無新 commit → 只回報「無變化,略過」,不動頁;
   - 完了**列出改了哪幾頁**。
-- 邊界:`last_commit` 不在 `--depth 100` 窗內,或上游 force-push / rebase 使其已不在遠端歷史 → 先 `git -C <TEMP> fetch --deepen=200`（或 `--unshallow`）;仍取不到 → 退回「摘要近期 N commit」,回報註明無法對 `last_commit` 精確 diff。
+- 邊界:`last_commit` 不在 `--depth 100` 窗內,或上游 force-push / rebase 使其已不在遠端歷史 → 先 `git -C <TEMP> fetch origin --deepen=200`（或 `git -C <TEMP> fetch --unshallow`）;仍取不到 → 退回「摘要近期 N commit」,回報註明無法對 `last_commit` 精確 diff。
 
 ### 降級（無 codegraph CLI / clone 失敗）
 不中斷:`WebFetch` README + `gh api` meta（可選）+ `WebSearch` 評價;**不跑 codegraph、不做程式碼架構抽取**,concept note 僅從 README / 評價可得範圍產生;回報標明降級原因與「未做程式碼架構分析」。
