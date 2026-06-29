@@ -19,6 +19,7 @@ bash bin/test-install.sh
 bash bin/test-uninstall.sh
 bash bin/test-skills-wiring.sh
 bash bin/test-ac4.sh
+bash bin/test-ingest-github.sh
 # 手動冒煙:
 bash install.sh && brainstem init /tmp/demo-brain && (cd /tmp/demo-brain && brainstem doctor)
 ```
